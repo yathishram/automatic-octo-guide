@@ -1,0 +1,45 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Theatres {
+    id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    name     String  @unique @db.VarChar(255)
+    location String  @db.VarChar(255)
+    Shows    Shows[]
+
+    @@map("theatres")
+}
+
+model Movies {
+    id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    title    String  @unique @db.VarChar(255)
+    rating   String  @db.VarChar(255)
+    duration Int?
+    language String  @db.VarChar(255)
+    Shows    Shows[]
+
+    @@map("movies")
+}
+
+model Shows {
+    id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    movie     Movies     @relation(fields: [movieId], references: [id])
+    movieId   String     @db.Uuid
+    theatre   Theatres   @relation(fields: [theatreId], references: [id])
+    theatreId String     @db.Uuid
+    ShowTime  ShowTime[]
+
+    @@map("shows")
+}
+
+model ShowTime {
+    id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    show      Shows    @relation(fields: [showId], references: [id])
+    showId    String   @db.Uuid
+    startTime DateTime @db.Time
+    endTime   DateTime @db.Time
+
+    @@map("show_time")
+}
